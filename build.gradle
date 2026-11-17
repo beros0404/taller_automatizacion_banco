@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.20'
+}
+
+ext { serenityVersion = '4.1.20' }
+
+repositories { mavenCentral() }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+dependencies {
+    implementation "net.serenity-bdd:serenity-core:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-ensure:${serenityVersion}"
+    implementation "org.hamcrest:hamcrest:2.2"
+    testImplementation "net.serenity-bdd:serenity-cucumber:${serenityVersion}"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "ch.qos.logback:logback-classic:1.4.14"
+}
+
+test {
+    useJUnit()
+    systemProperty "file.encoding", "UTF-8"
+    testLogging.showStandardStreams = true
+    systemProperty "pausa.ms", System.getProperty("pausa.ms", "1000")
+    if (System.getProperty("cucumber.filter.tags")) {
+        systemProperty "cucumber.filter.tags", System.getProperty("cucumber.filter.tags")
+    }
+    if (System.getProperty("headless.mode")) {
+        systemProperty "headless.mode", System.getProperty("headless.mode")
+    }
+    ignoreFailures = true
+}
+
+gradle.startParameter.continueOnFailure = true
+test.finalizedBy aggregate
